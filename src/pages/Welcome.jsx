@@ -34,7 +34,7 @@ export const Welcome = () => {
             <aside className="sidebar">
                 <div className="profile-box">
                     <img
-                        src="/me.jpg"
+                        src="gunterProfile.jpg"
                         alt="Profile"
                         className="profile-photo"
                     />
