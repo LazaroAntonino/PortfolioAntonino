@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router";
 
-
 export const Home = () => {
 	const [contador, setContador] = useState(0);
 	const [isCounting, setIsCounting] = useState(false);
+	const [mensajeCarga, setMensajeCarga] = useState("Cargando talento… esto puede llevar un rato.");
 	const navigate = useNavigate();
 
 	const handleEmpezarCuenta = () => {
@@ -13,77 +13,101 @@ export const Home = () => {
 		setIsCounting(true);
 	};
 
+	const cambiarMensajeAleatorio = () => {
+		const mensajes = [
+			"Desbloqueando todo tu potencial...",
+			"Preparando algo que no estás listo para ver...",
+			"Cargando habilidades ocultas...",
+			"Activando modo leyenda...",
+			"Desplegando talento en 3… 2… 1…",
+			"Renderizando tu futuro...",
+			"Compilando líneas de código del destino...",
+			"Empaquetando experiencias...",
+			"Sincronizando módulos de innovación...",
+			"Transfiriendo energía creativa...",
+			"Aplicando buff de productividad +50...",
+			"Creando ambiente épico...",
+			"Transformando ideas en realidad...",
+			"Refinando detalles...",
+			"Cargando texturas HD de tu carrera...",
+			"Optimización crítica en proceso...",
+			"La barra se mueve, así que algo estará pasando...",
+			"Esto no es magia, es JavaScript.",
+			"Últimos retoques maestros...",
+			"A punto de revelar algo grande..."
+		];
+
+		setMensajeCarga(mensajes[Math.floor(Math.random() * mensajes.length)]);
+	};
+
+
+
 	useEffect(() => {
-		let interval = null;
-		if (isCounting && contador < 100) {
-			let intervalSpeed;
-			switch (true) {
+		if (!isCounting || contador >= 100) return;
 
-				// Arranca lento (pero no demasiado)
-				case contador < 10:
-					intervalSpeed = 120;
-					break;
-
-				// Primer acelerón fuerte
-				case contador < 25:
-					intervalSpeed = 50;
-					break;
-
-				// Pequeño frenazo para simular carga real
-				case contador < 40:
-					intervalSpeed = 90;
-					break;
-
-				// Zona central rápida
-				case contador < 60:
-					intervalSpeed = 40;
-					break;
-
-				// Ligera desaceleración (se nota visualmente)
-				case contador < 75:
-					intervalSpeed = 70;
-					break;
-
-				// Último empujón rápido
-				case contador < 90:
-					intervalSpeed = 45;
-					break;
-
-				// Final un poco más lento para que se note
-				default:
-					intervalSpeed = 200;
-			}
-			interval = setInterval(() => {
-				setContador((prev) => prev + 1);
-			}, intervalSpeed);
-		} else if (contador === 100) {
-			setIsCounting(false);
-
-			// Espera 1 segundo y luego navega
-			const timeout = setTimeout(() => {
-				navigate("/useeffectpage");
-			}, 5000);
-
-			return () => clearTimeout(timeout);
+		let intervalSpeed;
+		switch (true) {
+			case contador < 10: intervalSpeed = 120; break;
+			case contador < 25: intervalSpeed = 50; break;
+			case contador < 40: intervalSpeed = 90; break;
+			case contador < 60: intervalSpeed = 40; break;
+			case contador < 75: intervalSpeed = 70; break;
+			case contador < 90: intervalSpeed = 45; break;
+			default: intervalSpeed = 200;
 		}
 
+		const interval = setInterval(() => {
+			setContador(prev => prev + 1);
+		}, intervalSpeed);
+
 		return () => clearInterval(interval);
-	}, [isCounting, contador, navigate]);
+
+	}, [isCounting, contador]);
+
+	useEffect(() => {
+		if (!isCounting || contador >= 100) return;
+
+		const interval = setInterval(() => {
+			cambiarMensajeAleatorio();
+		}, 1500); // Cambia cada 1.2s (más natural)
+
+		return () => clearInterval(interval);
+
+	}, [isCounting]);
+
+	useEffect(() => {
+		if (contador === 100) {
+			setIsCounting(false);
+			const timeout = setTimeout(() => navigate("/useeffectpage"), 3000);
+			return () => clearTimeout(timeout);
+		}
+	}, [contador, navigate]);
 
 
 	return (
-		<div className="text-center mt-5">
-			<h1>Pantalla de carga</h1>
+		<div className="home-container">
+			<div className="loader-box">
+				<h1 className="home-title">Bienvenido a mi portfolio</h1>
+				<h1 className="mb-5">Antonino Lázaro</h1>
 
-			{contador === 100 && (
-				<h2 className="text-success blink">Carga completada</h2>
-			)}
+				<div className="progress-bar-container">
+					<div
+						className="progress-bar-fill"
+						style={{ width: `${contador}%` }}
+					></div>
+				</div>
 
-			{contador !== 100 && <p>{contador}%</p>}
+				{contador !== 100 && <p className="contador-text">{contador}%</p>}
+				{isCounting && <p className="loading-text">{mensajeCarga}</p>}
 
-			{(!isCounting && contador !== 100) && <button onClick={handleEmpezarCuenta} disabled={isCounting}>
-				{isCounting ? "Cargando..." : "Empezar"}
-			</button>}
+				{!isCounting && contador !== 100 && (
+					<button className="start-button" onClick={handleEmpezarCuenta}>
+						Empezar
+					</button>
+				)}
+
+				{contador === 100 && <h2 className="text-success blink">Carga completada</h2>}
+			</div>
 		</div>
 	);
 };
